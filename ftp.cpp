@@ -1118,7 +1118,7 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
   }
 
   qCCritical(KIO_FTPS) << errormessage << " X " << errorcode;
-  error(errorcode, errormessage);
+  //error(errorcode, errormessage);
   return false;
 }
 
