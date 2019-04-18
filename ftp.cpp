@@ -197,8 +197,8 @@ Ftp::~Ftp()
  */
 void Ftp::ftpCloseDataConnection()
 {
-  if(m_data){
-      m_data->close();
+  if(m_data && m_data->isOpen()){
+      m_data->disconnectFromHost();
   }
   delete m_data;
   m_data = NULL;
@@ -1128,8 +1128,7 @@ bool Ftp::ftpCloseCommand()
   // we got for whatever was used in ftpOpenCommand ( should be 226 )
   if(m_data)
   {
-    delete  m_data;
-    m_data = NULL;
+    ftpCloseDataConnection();
   }
   if(!m_bBusy)
     return true;
