@@ -1104,7 +1104,7 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
       if (result != 0) 
       {
         qCCritical(KIO_FTPS) << "TLS Negotiation failed on the data channel; " << result;
-        error(result, QStringLiteral("TLS Negotiation failed on the data channel."));
+        //error(result, QStringLiteral("TLS Negotiation failed on the data channel."));
         return false;
       }
     }
