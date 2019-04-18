@@ -837,7 +837,7 @@ int Ftp::ftpOpenPASVDataConnection()
 #ifndef QT_NO_NETWORKPROXY
   m_data->setProxy(QNetworkProxy::DefaultProxy);
 #endif
-  m_data->connectToHost(addr.toString(), port);
+  m_data->connectToHostEncrypted(addr.toString(), port);
   m_data->waitForConnected(connectTimeout() * 1000);
 
   return m_data->state() == QAbstractSocket::ConnectedState ? 0 : ERR_INTERNAL;
@@ -877,7 +877,7 @@ int Ftp::ftpOpenEPSVDataConnection()
 #ifndef QT_NO_NETWORKPROXY
   m_data->setProxy(QNetworkProxy::DefaultProxy);
 #endif
-  m_data->connectToHost(address, portnum);
+  m_data->connectToHostEncrypted(address, portnum);
   m_data->waitForConnected(connectTimeout() * 1000);
   return m_data->isOpen() ? 0 : ERR_INTERNAL;
 }
@@ -1103,8 +1103,8 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
       int result = encryptDataChannel();
       if (result != 0) 
       {
-	error(result, QStringLiteral("TLS Negotiation failed on the data channel."));
-	return false;
+        error(result, QStringLiteral("TLS Negotiation failed on the data channel."));
+        return false;
       }
     }
 
