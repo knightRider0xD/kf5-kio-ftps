@@ -181,7 +181,7 @@ Ftp::Ftp( const QByteArray &pool, const QByteArray &app )
   ftpCloseControlConnection();
 
   // init other members
-  m_port = 990;
+  m_port = 0;
   qCDebug(KIO_FTPS) << "Ftp::Ftp()";
 }
 
