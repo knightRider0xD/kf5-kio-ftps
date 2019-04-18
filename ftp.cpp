@@ -1103,6 +1103,7 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
       int result = encryptDataChannel();
       if (result != 0) 
       {
+        qCCritical(KIO_FTPS) << "TLS Negotiation failed on the data channel; " << result;
         error(result, QStringLiteral("TLS Negotiation failed on the data channel."));
         return false;
       }
@@ -1111,6 +1112,7 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
     return true;
   }
 
+  qCCritical(KIO_FTPS) << errormessage << " " << errorcode;
   error(errorcode, errormessage);
   return false;
 }
@@ -1156,12 +1158,14 @@ void Ftp::mkdir( const QUrl & url, int permissions )
     // the directory already exists...
     if( ftpFolder( path, false ) )
     {
+      qCCritical(KIO_FTPS) << "Directory already exists: "<< path;
       error( ERR_DIR_ALREADY_EXIST, path );
       // Change the directory back to what it was...
       (void) ftpFolder( currentPath, false );
       return;
     }
 
+    qCCritical(KIO_FTPS) << "Could not MKDIR: "<< path;
     error( ERR_COULD_NOT_MKDIR, path );
     return;
   }
@@ -1181,10 +1185,12 @@ void Ftp::rename( const QUrl& src, const QUrl& dst, KIO::JobFlags flags )
         return;
 
   // The actual functionality is in ftpRename because put needs it
-  if ( ftpRename( src.path(), dst.path(), flags ) )
+  if ( ftpRename( src.path(), dst.path(), flags ) ) {
     finished();
-  else
+  } else {
+    qCCritical(KIO_FTPS) << "Cannot rename: "<< src.path();
     error( ERR_CANNOT_RENAME, src.path() );
+  }
 }
 
 bool Ftp::ftpRename( const QString & src, const QString & dst, KIO::JobFlags )
@@ -1222,10 +1228,12 @@ void Ftp::del( const QUrl& url, bool isfile )
   QByteArray cmd = isfile ? "DELE " : "RMD ";
   cmd += remoteEncoding()->encode(url);
 
-  if( !ftpSendCmd( cmd ) || (m_iRespType != 2) )
+  if( !ftpSendCmd( cmd ) || (m_iRespType != 2) ) {
+    qCCritical(KIO_FTPS) << "Cannot delete: "<< url.path();
     error( ERR_CANNOT_DELETE, url.path() );
-  else
+  } else {
     finished();
+  }
 }
 
 bool Ftp::ftpChmod( const QString & path, int permissions )
@@ -1257,10 +1265,12 @@ void Ftp::chmod( const QUrl & url, int permissions )
   if( !ftpOpenConnection(loginImplicit) )
         return;
 
-  if ( !ftpChmod( url.path(), permissions ) )
+  if ( !ftpChmod( url.path(), permissions ) ) {
+    qCCritical(KIO_FTPS) << "Cannot CHMOD: "<< url.path();
     error( ERR_CANNOT_CHMOD, url.path() );
-  else
+  } else {
     finished();
+  }
 }
 
 void Ftp::ftpCreateUDSEntry( const QString & filename, FtpEntry& ftpEnt, UDSEntry& entry, bool isDir )
@@ -2285,7 +2295,7 @@ bool Ftp::ftpFolder(const QString& path, bool bReportError)
   int iLen = newPath.length();
   if(iLen > 1 && newPath[iLen-1] == '/') newPath.truncate(iLen-1);
 
-  //qCDebug(KIO_FTPS) << "ftpFolder: want '" << newPath << "' has '" << m_currentPath << "'";
+  qCDebug(KIO_FTPS) << "ftpFolder: want '" << newPath << "' has '" << m_currentPath << "'";
   if(m_currentPath == newPath)
     return true;
 
