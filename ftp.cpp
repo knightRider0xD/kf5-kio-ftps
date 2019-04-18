@@ -73,7 +73,7 @@
 #include <kio/ioslave_defaults.h>
 #include <kio/slaveconfig.h>
 #include <kremoteencoding.h>
-#include <kde_file.h>
+#include <qplatformdefs.h>
 #include <kconfiggroup.h>
 #include <kmessagebox.h>
 
@@ -144,26 +144,29 @@ KIO::filesize_t Ftp::UnknownSize = (KIO::filesize_t)-1;
 
 using namespace KIO;
 
-extern "C" int KDE_EXPORT kdemain( int argc, char **argv )
+extern "C"
 {
-  QCoreApplication app(argc, argv);
-  app.setApplicationName(QStringLiteral("kio_ftps"));
+    int Q_DECL_EXPORT kdemain( int argc, char **argv )
+    {
+        QCoreApplication app(argc, argv);
+        app.setApplicationName(QStringLiteral("kio_ftps"));
 
-  ( void ) QLocale();
+        ( void ) QLocale();
 
-  qCDebug(KIO_FTPS) << "Starting " << getpid();
+        qCDebug(KIO_FTPS) << "Starting " << getpid();
 
-  if (argc != 4)
-  {
-     fprintf(stderr, "Usage: kio_ftps protocol domain-socket1 domain-socket2\n");
-     exit(-1);
-  }
+        if (argc != 4)
+        {
+            fprintf(stderr, "Usage: kio_ftps protocol domain-socket1 domain-socket2\n");
+            exit(-1);
+        }
 
-  Ftp slave(argv[2], argv[3]);
-  slave.dispatchLoop();
+        Ftp slave(argv[2], argv[3]);
+        slave.dispatchLoop();
 
-  qCDebug(KIO_FTPS) << "Done";
-  return 0;
+        qCDebug(KIO_FTPS) << "Done";
+        return 0;
+    }
 }
 
 //===============================================================================
@@ -2125,7 +2128,7 @@ Ftp::StatusCode Ftp::ftpPut(int& iError, int iCopyFile, const QUrl& dest_url,
     offset = m_size;
     if(iCopyFile != -1)
     {
-      if( KDE_lseek(iCopyFile, offset, SEEK_SET) < 0 )
+      if( QT_LSEEK(iCopyFile, offset, SEEK_SET) < 0 )
       {
         iError = ERR_CANNOT_RESUME;
         return statusClientError;
@@ -2347,9 +2350,9 @@ Ftp::StatusCode Ftp::ftpCopyPut(int& iError, int& iCopyFile, const QString &sCop
                                 const QUrl& url, int permissions, KIO::JobFlags flags)
 {
   // check if source is ok ...
-  KDE_struct_stat buff;
+  QT_STATBUF buff;
   QByteArray sSrc( QFile::encodeName(sCopyFile) );
-  bool bSrcExists = (KDE_stat( sSrc.data(), &buff ) != -1);
+  bool bSrcExists = (QT_STAT( sSrc.data(), &buff ) != -1);
   if(bSrcExists)
   { if(S_ISDIR(buff.st_mode))
     {
@@ -2363,7 +2366,7 @@ Ftp::StatusCode Ftp::ftpCopyPut(int& iError, int& iCopyFile, const QString &sCop
     return statusClientError;
   }
 
-  iCopyFile = KDE_open( sSrc.data(), O_RDONLY );
+  iCopyFile = QT_OPEN( sSrc.data(), O_RDONLY );
   if(iCopyFile == -1)
   {
     iError = ERR_CANNOT_OPEN_FOR_READING;
@@ -2384,9 +2387,9 @@ Ftp::StatusCode Ftp::ftpCopyGet(int& iError, int& iCopyFile, const QString &sCop
                                 const QUrl& url, int permissions, KIO::JobFlags flags)
 {
   // check if destination is ok ...
-  KDE_struct_stat buff;
+  QT_STATBUF buff;
   QByteArray sDest( QFile::encodeName(sCopyFile) );
-  bool bDestExists = (KDE_stat( sDest.data(), &buff ) != -1);
+  bool bDestExists = (QT_STAT( sDest.data(), &buff ) != -1);
   if(bDestExists)
   { if(S_ISDIR(buff.st_mode))
     {
@@ -2403,7 +2406,7 @@ Ftp::StatusCode Ftp::ftpCopyGet(int& iError, int& iCopyFile, const QString &sCop
   // do we have a ".part" file?
   QByteArray sPart = QFile::encodeName(sCopyFile + ".part");
   bool bResume = false;
-  bool bPartExists = (KDE_stat( sPart.data(), &buff ) != -1);
+  bool bPartExists = (QT_STAT( sPart.data(), &buff ) != -1);
   bool bMarkPartial = config()->readEntry("MarkPartial", true);
   if(bMarkPartial && bPartExists && buff.st_size > 0)
   { // must not be a folder! please fix a similar bug in kio_file!!
@@ -2440,8 +2443,8 @@ Ftp::StatusCode Ftp::ftpCopyGet(int& iError, int& iCopyFile, const QString &sCop
   KIO::fileoffset_t hCopyOffset = 0;
   if(bResume)
   {
-    iCopyFile = KDE_open( sPart.data(), O_RDWR );  // append if resuming
-    hCopyOffset = KDE_lseek(iCopyFile, 0, SEEK_END);
+    iCopyFile = QT_OPEN( sPart.data(), O_RDWR );  // append if resuming
+    hCopyOffset = QT_LSEEK(iCopyFile, 0, SEEK_END);
     if(hCopyOffset < 0)
     {
       iError = ERR_CANNOT_RESUME;
@@ -2450,7 +2453,7 @@ Ftp::StatusCode Ftp::ftpCopyGet(int& iError, int& iCopyFile, const QString &sCop
     qCDebug(KIO_FTPS) << "copy: resuming at " << hCopyOffset;
   }
   else
-    iCopyFile = KDE_open(sPart.data(), O_CREAT | O_TRUNC | O_WRONLY, initialMode);
+    iCopyFile = QT_OPEN(sPart.data(), O_CREAT | O_TRUNC | O_WRONLY, initialMode);
 
   if(iCopyFile == -1)
   {
@@ -2486,7 +2489,7 @@ Ftp::StatusCode Ftp::ftpCopyGet(int& iError, int& iCopyFile, const QString &sCop
         iRes = statusClientError;
       }
     }
-    else if(KDE_stat( sPart.data(), &buff ) == 0)
+    else if(QT_STAT( sPart.data(), &buff ) == 0)
     { // should a very small ".part" be deleted?
       int size = config()->readEntry("MinimumKeepSize", DEFAULT_MINIMUM_KEEP_SIZE);
       if (buff.st_size <  size)

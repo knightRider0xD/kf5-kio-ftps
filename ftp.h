@@ -48,7 +48,7 @@ struct FtpEntry
 class SslServer : public QTcpServer
 {
   private: 
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor) override;
     QSslSocket *m_socket;
   public:
     QSslSocket *socket() { return m_socket; };
@@ -65,7 +65,7 @@ public:
   Ftp( const QByteArray &pool, const QByteArray &app );
   virtual ~Ftp();
 
-  virtual void setHost( const QString& host, quint16 port, const QString& user, const QString& pass );
+  virtual void setHost( const QString& host, quint16 port, const QString& user, const QString& pass ) override;
 
   /**
    * Connects to a ftp server and logs us in
@@ -73,31 +73,31 @@ public:
    * It is set to false if the connection becomes closed.
    *
    */
-  virtual void openConnection();
+  virtual void openConnection() override;
 
   /**
    * Closes the connection
    */
-  virtual void closeConnection();
+  virtual void closeConnection() override;
 
-  virtual void stat( const QUrl &url );
+  virtual void stat( const QUrl &url ) override;
 
-  virtual void listDir( const QUrl & url );
-  virtual void mkdir( const QUrl & url, int permissions );
-  virtual void rename( const QUrl & src, const QUrl & dst, KIO::JobFlags flags );
-  virtual void del( const QUrl & url, bool isfile );
-  virtual void chmod( const QUrl & url, int permissions );
+  virtual void listDir( const QUrl & url ) override;
+  virtual void mkdir( const QUrl & url, int permissions ) override;
+  virtual void rename( const QUrl & src, const QUrl & dst, KIO::JobFlags flags ) override;
+  virtual void del( const QUrl & url, bool isfile ) override;
+  virtual void chmod( const QUrl & url, int permissions ) override;
 
-  virtual void get( const QUrl& url );
-  virtual void put( const QUrl& url, int permissions, KIO::JobFlags flags );
-  //virtual void mimetype( const QUrl& url );
+  virtual void get( const QUrl& url ) override;
+  virtual void put( const QUrl& url, int permissions, KIO::JobFlags flags ) override;
+  //virtual void mimetype( const QUrl& url ) override;
 
-  virtual void slave_status();
+  virtual void slave_status() override;
 
   /**
    * Handles the case that one side of the job is a local file
    */
-  virtual void copy( const QUrl &src, const QUrl &dest, int permissions, KIO::JobFlags flags );
+  virtual void copy( const QUrl &src, const QUrl &dest, int permissions, KIO::JobFlags flags ) override;
 
 private:
   // ------------------------------------------------------------------------
