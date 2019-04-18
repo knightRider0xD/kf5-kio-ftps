@@ -1564,7 +1564,8 @@ void Ftp::listDir( const QUrl &url )
     }
     // not sure which to emit
     //error( ERR_DOES_NOT_EXIST, path );
-    error( ERR_CANNOT_ENTER_DIRECTORY, path );
+    qCDebug(KIO_FTPS) << "3";
+    //error( ERR_CANNOT_ENTER_DIRECTORY, path );
     return;
   }
 
