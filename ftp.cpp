@@ -197,6 +197,7 @@ Ftp::~Ftp()
  */
 void Ftp::ftpCloseDataConnection()
 {
+  m_data.close();
   delete m_data;
   m_data = NULL;
 }
@@ -954,9 +955,9 @@ int Ftp::ftpOpenDataConnection()
       iErrCode = ftpOpenEPSVDataConnection();
       if(iErrCode == 0)
       {
-	// success
-	requestDataEncryption();
-	return 0; 
+        // success
+        requestDataEncryption();
+        return 0; 
       }
       ftpCloseDataConnection();
     }
