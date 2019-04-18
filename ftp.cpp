@@ -382,7 +382,7 @@ bool Ftp::ftpOpenControlConnection( const QString &host, int port, bool ignoreSs
 #ifndef QT_NO_NETWORKPROXY
     m_control->setProxy(QNetworkProxy::DefaultProxy);
 #endif
-    m_control->connectToHostEncrypted(host, port);
+    m_control->connectToHost(host, port);
     m_control->waitForConnected(connectTimeout() * 1000);
   int iErrorCode = m_control->state() == QAbstractSocket::ConnectedState ? 0 : ERR_COULD_NOT_CONNECT;
 
@@ -426,7 +426,7 @@ bool Ftp::ftpOpenControlConnection( const QString &host, int port, bool ignoreSs
     // ignore the errors during handshakes. 
 
     if (ignoreSslErrors) m_control->ignoreSslErrors();
-    //m_control->startClientEncryption();
+    m_control->startClientEncryption();
 
     if (!m_control->waitForEncrypted(connectTimeout() * 1000)) 
     {
@@ -837,7 +837,7 @@ int Ftp::ftpOpenPASVDataConnection()
 #ifndef QT_NO_NETWORKPROXY
   m_data->setProxy(QNetworkProxy::DefaultProxy);
 #endif
-  m_data->connectToHostEncrypted(addr.toString(), port);
+  m_data->connectToHost(addr.toString(), port);
   m_data->waitForConnected(connectTimeout() * 1000);
 
   return m_data->state() == QAbstractSocket::ConnectedState ? 0 : ERR_INTERNAL;
@@ -877,7 +877,7 @@ int Ftp::ftpOpenEPSVDataConnection()
 #ifndef QT_NO_NETWORKPROXY
   m_data->setProxy(QNetworkProxy::DefaultProxy);
 #endif
-  m_data->connectToHostEncrypted(address.toString(), portnum);
+  m_data->connectToHost(address, portnum);
   m_data->waitForConnected(connectTimeout() * 1000);
   return m_data->isOpen() ? 0 : ERR_INTERNAL;
 }
@@ -886,8 +886,8 @@ int Ftp::encryptDataChannel()
 {
   if (m_bIgnoreSslErrors) m_data->ignoreSslErrors();
 
-  //if (m_bPasv) m_data->startClientEncryption();
-  //else m_data->startServerEncryption();
+  if (m_bPasv) m_data->startClientEncryption();
+  else m_data->startServerEncryption();
 
   if (!m_data->waitForEncrypted(connectTimeout() * 1000)) return ERR_SLAVE_DEFINED;
 
