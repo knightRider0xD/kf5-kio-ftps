@@ -199,7 +199,10 @@ void Ftp::ftpCloseDataConnection()
 {
   if(m_data && m_data->isOpen()){
       m_data->disconnectFromHost();
-      m_data->waitForDisconnected(connectTimeout() * 1000);
+      if (m_data->state() == QAbstractSocket::UnconnectedState ||
+        m_data->waitForDisconnected(connectTimeout() * 1000)) {
+        qCDebug(KIO_FTPS) << "Data connection closed";
+      }
   }
   delete m_data;
   m_data = NULL;
@@ -212,6 +215,15 @@ void Ftp::ftpCloseDataConnection()
 void Ftp::ftpCloseControlConnection()
 {
   m_extControl = 0;
+  
+  if(m_control && m_control->isOpen()){
+      m_control->disconnectFromHost();
+      if (m_control->state() == QAbstractSocket::UnconnectedState ||
+        m_control->waitForDisconnected(connectTimeout() * 1000)) {
+        qCDebug(KIO_FTPS) << "Control connection closed";
+      }
+  }
+  
   delete m_control;
   m_control = NULL;
   m_cDataMode = 0;
@@ -283,7 +295,6 @@ void Ftp::closeConnection()
   if(m_bBusy)              // ftpCloseCommand not called
   {
     qCWarning(KIO_FTPS) << "Ftp::closeConnection Abandoned data stream";
-    ftpCloseDataConnection();
   }
 
   if(m_bLoggedOn)           // send quit
@@ -1564,8 +1575,7 @@ void Ftp::listDir( const QUrl &url )
     }
     // not sure which to emit
     //error( ERR_DOES_NOT_EXIST, path );
-    qCDebug(KIO_FTPS) << "3";
-    //error( ERR_CANNOT_ENTER_DIRECTORY, path );
+    error( ERR_CANNOT_ENTER_DIRECTORY, path );
     return;
   }
 
