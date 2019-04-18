@@ -901,8 +901,15 @@ int Ftp::encryptDataChannel()
 {
   if (m_bIgnoreSslErrors) m_data->ignoreSslErrors();
 
-  if (m_bPasv) m_data->startClientEncryption();
-  else m_data->startServerEncryption();
+  if (m_bPasv){
+      qCDebug(KIO_FTPS) << "Start client data encrytion";
+      m_data->startClientEncryption();
+  } else {
+      qCDebug(KIO_FTPS) << "Start server data encrytion";
+      m_data->startServerEncryption();
+  }
+  
+  
 
   if (!m_data->waitForEncrypted(connectTimeout() * 1000)) return ERR_SLAVE_DEFINED;
 
@@ -1120,7 +1127,7 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
       if (result != 0) 
       {
         qCCritical(KIO_FTPS) << "TLS Negotiation failed on the data channel; " << result;
-        //error(result, QStringLiteral("TLS Negotiation failed on the data channel."));
+        error(result, QStringLiteral("TLS Negotiation failed on the data channel."));
         return false;
       }
     }
@@ -1128,8 +1135,8 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
     return true;
   }
 
-  qCCritical(KIO_FTPS) << errormessage << " X " << errorcode;
-  //error(errorcode, errormessage);
+  qCCritical(KIO_FTPS) << errormessage << " " << errorcode;
+  error(errorcode, errormessage);
   return false;
 }
 
