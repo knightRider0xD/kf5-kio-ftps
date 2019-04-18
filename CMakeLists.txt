@@ -17,5 +17,5 @@ feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 add_library(kio_ftps MODULE ftp.cpp)
 target_link_libraries(kio_ftps Qt5::Core Qt5::Network Qt5::Widgets KF5::KIOCore KF5::WidgetsAddons)
 
-install(TARGETS kio_ftps DESTINATION ${PLUGIN_INSTALL_DIR})
+install(TARGETS kio_ftps DESTINATION ${KDE_INSTALL_PLUGINDIR})
 install(FILES ftps.protocol DESTINATION ${SERVICES_INSTALL_DIR})
