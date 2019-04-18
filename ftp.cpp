@@ -1630,7 +1630,7 @@ bool Ftp::ftpOpenDir( const QString & path )
   // The only way to really know would be to have a metadata flag for this...
   // Since some windows ftp server seems not to support the -a argument, we use a fallback here.
   // In fact we have to use -la otherwise -a removes the default -l (e.g. ftp.trolltech.com)
-  if( !ftpOpenCommand( "list -la", QString(), 'I', ERR_CANNOT_ENTER_DIRECTORY ) )
+  if( !ftpOpenCommand( "MLSD", QString(), 'I', ERR_CANNOT_ENTER_DIRECTORY ) )
   {
     if ( !ftpOpenCommand( "list", QString(), 'I', ERR_CANNOT_ENTER_DIRECTORY ) )
     {
