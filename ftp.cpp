@@ -197,7 +197,9 @@ Ftp::~Ftp()
  */
 void Ftp::ftpCloseDataConnection()
 {
-  m_data->close();
+  if(m_data){
+      m_data->close();
+  }
   delete m_data;
   m_data = NULL;
 }
