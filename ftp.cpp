@@ -199,6 +199,7 @@ void Ftp::ftpCloseDataConnection()
 {
   if(m_data && m_data->isOpen()){
       m_data->disconnectFromHost();
+      m_data->waitForDisconnected(connectTimeout() * 1000);
   }
   delete m_data;
   m_data = NULL;
