@@ -1084,8 +1084,9 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
 
   if( !ftpSendCmd( tmp ) || (m_iRespType != 1) )
   {
-    if( _offset > 0 && strcmp(_command, "retr") == 0 && (m_iRespType == 4) )
-      errorcode = ERR_CANNOT_RESUME;
+    if( _offset > 0 && strcmp(_command, "retr") == 0 && (m_iRespType == 4) ) {
+        errorcode = ERR_CANNOT_RESUME;
+    }
     // The error here depends on the command
     errormessage = _path;
   }
@@ -1112,7 +1113,7 @@ bool Ftp::ftpOpenCommand( const char *_command, const QString & _path, char _mod
     return true;
   }
 
-  qCCritical(KIO_FTPS) << errormessage << " " << errorcode;
+  qCCritical(KIO_FTPS) << errormessage << " X " << errorcode;
   error(errorcode, errormessage);
   return false;
 }
