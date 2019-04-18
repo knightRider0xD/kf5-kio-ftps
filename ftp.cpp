@@ -909,8 +909,6 @@ int Ftp::encryptDataChannel()
       m_data->startServerEncryption();
   }
   
-  
-
   if (!m_data->waitForEncrypted(connectTimeout() * 1000)) return ERR_SLAVE_DEFINED;
 
   return 0;
